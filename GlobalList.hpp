@@ -1,3 +1,4 @@
+// GlobalList.hpp by siklerx @ Github
 #pragma once
 #include <vector>
 #include <shared_mutex>
