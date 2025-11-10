@@ -1,26 +1,50 @@
-# GlobalList
+# 🧩 GlobalList — A Thread-Safe Global Container for Modern C++
 
-`GlobalList<T>` is a thread-safe globally accessible list container (singleton) using C++17 `std::shared_mutex`.
+![C++17](https://img.shields.io/badge/C%2B%2B-17-blue.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+![Build](https://img.shields.io/badge/build-passing-brightgreen.svg)
+![Thread-Safe](https://img.shields.io/badge/thread-safe-orange.svg)
 
-### Features
-- Thread-safe push operations (`Push`, `Emplace`)
-- Safe read operations: `GetSnapshot()` returns a copy; `ForEach(Func)` iterates under shared lock
-- Clear all entries `Clear()`, get current count `Size()`
-- Singleton access via `Instance()`
+`GlobalList<T>` is a lightweight, thread-safe, singleton-based container for managing global shared data across threads or modules — built with **modern C++17+**.
+
+---
+
+## 🚀 Features
+
+- 🧵 **Fully thread-safe** using `std::shared_mutex`  
+- 📦 **Global singleton** access per template type  
+- ⚡ **Zero external dependencies** — standard C++ only  
+- 🔄 **Copy-safe reads** with `GetSnapshot()`  
+- 🧭 **In-place construction** using `Emplace()`  
+- 🧰 **Functional iteration** with `ForEach(Func&&)`  
+- 🧹 **RAII-style cleanup** (`Clear()` automatically releases memory)
+
+---
 
 ### Usage
 ```cpp
+#include <iostream>
 #include "GlobalList.hpp"
 
-// push items
-GlobalList<int>::Instance().Push(10);
-GlobalList<int>::Instance().Emplace(20);
+struct Player {
+    std::string name;
+    int score;
+};
 
-// iterate
-GlobalList<int>::Instance().ForEach([](int x){
-    std::cout << x << std::endl;
-});
+int main() {
+    // Add data (thread-safe)
+    GlobalList<Player>::Instance().Emplace("Alice", 100);
+    GlobalList<Player>::Instance().Push({"Bob", 75});
 
-// snapshot
-auto snapshot = GlobalList<int>::Instance().GetSnapshot();
-std::cout << "Size: " << snapshot.size() << std::endl;
+    // Iterate safely
+    GlobalList<Player>::Instance().ForEach([](const Player& p) {
+        std::cout << p.name << " -> " << p.score << std::endl;
+    });
+
+    // Snapshot access (copy)
+    auto players = GlobalList<Player>::Instance().GetSnapshot();
+    std::cout << "Total players: " << players.size() << std::endl;
+
+    // Clear all
+    GlobalList<Player>::Instance().Clear();
+}
